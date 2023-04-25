@@ -1,0 +1,24 @@
+﻿@model TechTreeWebApp.Entities.Content
+
+<h2>@Model.Title</h2> <!-- null Title hmm-->
+
+@if (Model.HTMLContent != null)
+{
+    <div class="row">
+        <div id="TextContent" class="mt-3 col-md-10">
+            @Html.Raw(@Model.HTMLContent)
+            <!-- calling the Html.Raw() wraps html markup to a html instance -->
+        </div>
+    </div>
+}
+@if (Model.VideoLink != null)
+{
+    <div class="row">
+        <div class="mt-3 col-md-10">
+            <div id="VideoContent" class="video-container mt-3"> <!-- video-container is acu-->
+                <iframe width="550" height="350" src="@Model.VideoLink"  allowfullscreen="" frameborder="0">
+                </iframe>
+            </div>
+        </div>
+    </div>
+}

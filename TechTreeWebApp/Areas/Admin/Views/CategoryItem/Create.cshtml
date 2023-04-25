@@ -1,0 +1,56 @@
+﻿@model TechTreeWebApp.Entities.CategoryItem
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>CategoryItem</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <input type="hidden" asp-for="CategoryId" value="@Model.CategoryId"/>
+            <!-- We don't want the user to see the Id :: Aspl-for will deal w/ the CategoryId, so no need to set value to Model.CategoryId-->
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>           
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MediaTypeId" class="control-label"></label>
+                <select asp-for="MediaTypeId" class="form-control" asp-items="@Model.MediaTypes">
+                    <option value="">--Please select a media type--</option>
+                </select>
+                <span asp-validation-for="MediaTypeId" class="text-danger"></span> <!-- Mediatype must not be null -->
+            </div>
+            <div class="form-group">
+                <label asp-for="DateItemReleased" class="control-label"></label>
+                <input type="text" name="DateItemReleased" id="DateItemReleased" class="datepicker form-control" value="@Model.DateItemReleased.ToString("MM-dd-yyyy")" />
+                <span asp-validation-for="DateItemReleased" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" asp-route-categoryId="@Model.CategoryId">Back to List</a> <!-- Must also work on the other .CRUD files-->
+</div>
+
+@section Scripts {
+    <!-- Just drag and drop the .js, but instead of referencing the js here, well ref it in another partial view-->
+    @{
+        await Html.RenderPartialAsync("_DateScriptPartial");
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+}

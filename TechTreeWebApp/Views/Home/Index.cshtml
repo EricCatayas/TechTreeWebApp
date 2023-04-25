@@ -1,0 +1,99 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@using TechTreeWebApp.Data
+@inject SignInManager<ApplicationUser> signInManager;
+@model CategoryDetailsModel;
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+@if (signInManager.IsSignedIn(User))
+{
+    <div class="text-center">
+        <h1 class="display-4">Welcome to TechTree!</h1>
+    </div>
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <h2>Your Courses</h2>
+            <a asp-controller="CategoriesToUser" asp-action="Index" class="btn btn-outline-dark"> Choose your Courses</a> 
+        </div>
+    </div>      <!-- Your Courses Section-->
+    @if (Model.GroupedCategoryItemsByCategoryModels.Count() > 0) 
+    {
+
+        <div class="row mt-3">
+            <div class="col-md-12">
+
+                @foreach (var cat in Model.GroupedCategoryItemsByCategoryModels)
+                {
+                    <div class="card mt-2">
+                        <!-- User CategoryId for identifying each category -- Bootstrap card for layouting -->
+                        <!-- data-toggle & target enncapsulated withing the div to implement a collapse effect -->
+                        <h4 class="card-header text-secondary bg-white" style="cursor:pointer" data-bs-toggle="collapse" data-bs-target="#collapse_@cat.Id" aria-expanded="false" aria-controls="collapse_@cat.Id">
+                            @cat.Title
+                        </h4>
+                        <div id="collapse_@cat.Id" class="collapse" aria-expanded="false" aria-controls="collapse_@cat.Id">
+                            <hr />
+                            @foreach (var item in cat.Items) // .Items refers to an IGrouping<> interface
+                            {
+                                <div class="mt-2">
+                                    <img src="@item.MediaImagePath" width="100" height="100" class="img-thumbnail float-left mr-2" />
+                                    <h5 class="card-title mt-2">
+                                        <!-- En-route to ContentController public async Task<IActionResult> Index(int categoryItemId) -->
+                                        <a class="text-dark" asp-controller="Content" asp-action="Index" asp-route-categoryItemId="@item.CategoryItemId">@item.CategoryItemTitle</a>
+                                    </h5>
+                                    <p class="card-text text-dark mt-2">
+                                        @item.CategoryItemDescription
+                                    </p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    }
+    else
+    {
+        <h4 class="mt-2 text-warning">You are currently not matched with any courses</h4>
+    }
+} 
+else
+{
+    <partial name="_DefaultHomePageContentPartial" model="@Model.Categories"></partial>
+}
+
+
+
+<div class="modal fade" id="UserLoginModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!-- our Home.Index.cshtml then became strongly-typed for CategoryDetailsModel; _UserLoginPartial and _UserRegistrationPartial NOW requires a model -->
+    <partial name="_UserLoginPartial" model="new LoginModel
+    {
+        Email = string.Empty,
+        Password = string.Empty,
+        RememberMe = false
+    }        
+    "></partial> <!-- we can update the contents of this div element using jquery code-->
+</div>
+<div class="modal fade" id="UserRegistrationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <partial name="_UserRegistrationPartial" model="new RegistrationModel
+        {
+            Email = String.Empty,
+            Password = String.Empty,
+            ConfirmPassword = String.Empty,
+            FirstName = String.Empty,
+            LastName = String.Empty,
+            PhoneNumber = String.Empty,
+            Address1 = String.Empty,
+            Address2 = String.Empty,
+            PostCode = String.Empty,
+            AcceptTermsAndAgreement = false
+        }" />
+</div>
+
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_AutoScriptsPartial"); <!-- using statements for js included here -->
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

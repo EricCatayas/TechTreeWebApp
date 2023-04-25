@@ -1,0 +1,6 @@
+﻿@model int
+<!-- MVC knows his sh*t -->
+<!-- Now we can Define the buttons without repetition -->
+<a asp-action="Edit" asp-route-id="@Model" class="text-info mr-2"><i class="fa-regular fa-pen-to-square"></i></a> |
+<a asp-action="Details" asp-route-id="@Model" class="text-info mr-2"><i class="fa-solid fa-bars"></i></a> |
+<a asp-action="Delete" asp-route-id="@Model" class="text-danger mr-2"><i class="fa-solid fa-trash"></i></a>

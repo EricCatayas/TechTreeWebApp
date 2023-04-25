@@ -1,0 +1,100 @@
+﻿@model TechTreeWebApp.Models.RegistrationModel;
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Register Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            <div id="alert_placeholder_registration">
+            </div><!-- Can be M: by Jquery dynamically i.e BootstrapAlert.js-->
+            <form id="UserRegistrationForm" asp-controller="UserAuth" asp-action="RegisterUser">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="RegistrationInValid"/>
+                <input asp-for="CategoryId" type="hidden" />
+                    <div class="form-group row mb-1">
+                        <label asp-for="UserName" class="col-form-label col-md-4"></label>
+                            <div class="col-md-8">
+                                <input asp-for="UserName" id="username" class="form-control" placeholder="Enter your Username" />
+                                <span asp-validation-for="UserName" class="text-danger"></span>
+                            </div>
+                    </div>
+                    <div class="form-group row mb-1">
+                        <label asp-for="Email" class="col-form-label col-md-4"></label>
+                            <div class="col-md-8">
+                                <input class="form-control" asp-for="Email" placeholder="Enter your password" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>                                    
+                    </div>
+                    <div class="form-group row mb-1">
+                        <label asp-for="Password" class="col-form-label col-md-4"></label>
+                        <div class="col-md-8">
+                            <input asp-for="Password" class="form-control" placeholder="(Must include atleast 1 uppercase & lowercase, 1 alphanumeric & numeric)" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-1">
+                        <label asp-for="ConfirmPassword" class="col-form-label col-md-4"></label>
+                        <div class="col-md-8">
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="Re-type your password" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-1">
+                        <label asp-for="FirstName" class="col-form-label col-md-4"></label>
+                        <div class="col-md-8">
+                            <input asp-for="FirstName" class="form-control" placeholder="Enter your first name" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-1">
+                        <label asp-for="LastName" class="col-form-label col-md-4"></label>
+                        <div class="col-md-8">
+                            <input asp-for="LastName" class="form-control" placeholder="Enter your last name" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-1">
+                        <label asp-for="Address1" class="col-form-label col-md-4"></label>
+                        <div class="col-md-8">
+                            <input asp-for="Address1" class="form-control" placeholder="(House No./Suite No./Floor/etc)" />
+                            <span asp-validation-for="Address1" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-1">
+                        <label asp-for="Address2" class="col-form-label col-md-4"></label>
+                        <div class="col-md-8">
+                        <input asp-for="Address2" class="form-control" placeholder="(Subdivision, Street, City Name)" />
+                            <span asp-validation-for="Address2" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-1">
+                        <label asp-for="PostCode" class="col-form-label col-md-4"></label>
+                        <div class="col-md-8">
+                            <input asp-for="PostCode" class="form-control" placeholder="Post Code" />
+                            <span asp-validation-for="PostCode" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-1">
+                        <label asp-for="PhoneNumber" class="col-form-label col-md-4"></label>
+                        <div class="col-md-8">
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="#" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <div class="form-check">                                
+                                <input type="checkbox" id="checkbox" asp-for="AcceptTermsAndAgreement"/>
+                                <label class="form-check-label" asp-for="AcceptTermsAndAgreement"> I accept the <a href="#">Terms and Condition</a> and <a href="#"> Privacy Policy </a> </label>
+                            </div>
+                        </div>
+                    </div>                      
+            </form>            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="register" name="register" class="btn btn-primary">Register Account</button>
+            </div>
+        </div>
+    </div>

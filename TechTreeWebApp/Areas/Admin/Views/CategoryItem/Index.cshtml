@@ -1,0 +1,58 @@
+﻿@model IEnumerable<TechTreeWebApp.Entities.CategoryItem>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <!-- When this link is clicked, the corresponding categoryId will be passed to the Create() in the Controller-->
+    <partial name="_CreateButtonPartial" model="@ViewBag.CategoryId"/>
+    <!--<a asp-action="Create" asp-route-categoryId="@ViewBag.CategoryId">Create New</a>-->
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>            
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>           
+            <th>
+                @Html.DisplayNameFor(model => model.DateItemReleased)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+    <!-- Each item represents a category-->
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>            
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>           
+            <td>
+                @Html.DisplayFor(modelItem => item.DateItemReleased)
+            </td>
+            <td>                
+                <partial name="_CRUDButtonsPartial" model="@item.Id" />                
+                <!-- MVC is smart enough to know which Index() is being called -->
+                <!-- aif()-->
+                    @if (item.ContentId != 0)
+                    {
+                        <a asp-controller="Content" asp-action="Edit" asp-route-categoryItemId="@item.Id" asp-route-categoryId="@item.CategoryId">Edit Content</a>
+                        <!-- if ContentId == 0, Link must be "Add Content", -->
+                    }
+                    else
+                    {
+                        <a asp-controller="Content" asp-action="Create" asp-route-categoryItemId="@item.Id" asp-route-categoryId="@item.CategoryId">Add Content </a>
+                    }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

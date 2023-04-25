@@ -1,0 +1,10 @@
+﻿@model int
+
+@if(Model == 0){
+    @* This is for Category -- since Category.Id is autoincrement upon EF Core.Add()*@
+    <a asp-action="Create" class="btn btn-outline-info"><i class="fa-solid fa-plus"></i> Create New</a>
+}
+else 
+{
+    <a asp-action="Create" asp-route-categoryId="@Model" class="btn btn-outline-info"><i class="fa-solid fa-plus"></i>Create New</a>
+}

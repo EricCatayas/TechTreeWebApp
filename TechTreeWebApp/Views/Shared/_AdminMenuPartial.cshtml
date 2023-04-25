@@ -1,0 +1,44 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@using Microsoft.AspNetCore;
+@using TechTreeWebApp.Data;
+<!-- 	Admin Menu should be restricted from non-administrators-->
+@inject SignInManager<ApplicationUser> SigninManager;
+@inject UserManager<ApplicationUser> UserManager;
+<!-- Dependency Injection to inject generic type SignINManager and .. Into this view -- integrating identity technolog-->
+<!-- If user is logged in and is part of the Admin Role-->
+@if(SigninManager.IsSignedIn(User) && await UserManager.IsInRoleAsync(UserManager.GetUserAsync(User).Result, "admin"))
+{
+<!-- This is a razor view-->
+<!-- A Bootstrap refers to a smaller system that boots up a much larger system.-->
+<div class="nav-item dropdown show">        
+    <a class="dropdown-toggle nav-link text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-solid fa-table-list"></i>
+    Admin
+    </a>
+    <ul class="dropdown-menu">
+        <!-- Naming Convention: Remove suffix in Controller i.e "CategoryController"-->
+        <li><a class="dropdown-item" asp-area="Admin" asp-controller="Category" asp-action="Index">
+            Categories
+         </a></li>
+            <!-- UsersToCategory.js linking menu item to UserCategory.Index.cshtml-->
+            <li><a class="dropdown-item" asp-area="Admin" asp-controller="UserCategory" asp-action="Index">Users to Categories</a></li>
+        <li><a class="dropdown-divider"></a></li>
+        <li><a class="dropdown-item" asp-area="Admin" asp-controller="MediaType" asp-action="Index">Media</a></li>
+    </ul>
+</div>
+}
+else if (!SigninManager.IsSignedIn(User))
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" href="#CoursesSection"><i class="fa-solid fa-box-open"></i> Courses Offered</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-dark" href="#ContactUsSection"><i class="fa-solid fa-envelope"></i> Contact Us</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-dark" href="#AboutUsSection"><i class="fa-solid fa-circle-info"></i> About Us</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    </li>
+}
