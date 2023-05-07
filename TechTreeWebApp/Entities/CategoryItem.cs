@@ -9,9 +9,13 @@ namespace TechTreeWebApp.Entities
         private DateTime _releasedDate = DateTime.MinValue;
         public int Id { get; set; }
         [Required][StringLength(150, MinimumLength = 2)]
-        public string Title { get; set; } = string.Empty;
+        public string? Title { get; set; }
         public int CategoryId { get; set; }
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        [ForeignKey("Id")]
+        public virtual Category? Category { get; set; }
+        [ForeignKey("CategoryItemId")]
+        public virtual Content? Content { get; set; }
         [NotMapped] // forcing entity framework to gnore MediaType's props
         public virtual ICollection<SelectListItem>? MediaTypes { get; set; }
         [Required(ErrorMessage = "Please select an item from the '{0}' drop down menu")]
@@ -30,7 +34,6 @@ namespace TechTreeWebApp.Entities
                 _releasedDate = value;
             }
         }
-        [NotMapped]
         public int ContentId { get; set; }
     }
 }

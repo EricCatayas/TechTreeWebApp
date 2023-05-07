@@ -26,11 +26,12 @@ namespace TechTreeWebApp.Controllers
         [HttpPost]
         [AllowAnonymous] //no security restrictions are imposed
         [ValidateAntiForgeryToken] //denotes an action filter, request made to this filter are blocked unless the request a valid anti forgery token -- preventing cross site forgery
-        public async Task<IActionResult> Login(LoginModel loginModel) // Args passed through dependency injection
+        public async Task<IActionResult> Login(LoginModel loginModel) 
         {
             loginModel.LoginInValid = "true";
             ApplicationUser signedUser = await _userManager.FindByEmailAsync(loginModel.Email); // UserName and Email get Interchanged
-            if (ModelState.IsValid) {
+            if (ModelState.IsValid) 
+            {
                 var identityresult = await _signInManager.PasswordSignInAsync(signedUser.UserName, loginModel.Password, loginModel.RememberMe, lockoutOnFailure: true);
                                                                         //params: string userName, password, bool isPersistent
                 if (identityresult.Succeeded)

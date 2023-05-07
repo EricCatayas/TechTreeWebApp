@@ -1,6 +1,6 @@
 ﻿using TechTreeWebApp.Entities;
 
-namespace TechTreeWebApp.Data
+namespace TechTreeWebApp.ServiceContracts
 {
     public interface IDataFunctions
     {

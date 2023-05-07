@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TechTreeWebApp.Data;
 using TechTreeWebApp.Entities;
+using TechTreeWebApp.ServiceContracts;
 
 namespace TechTreeWebApp.Areas.Admin.Controllers
 {
@@ -16,11 +17,17 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class ContentController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICategoryItemGetterService _categoryItemGetterService;
+        private readonly IContentAdderService _contentAdderService;
+        private readonly IContentGetterService _contentGetterService;
+        private readonly IContentUpdaterService _contentUpdaterService;
 
-        public ContentController(ApplicationDbContext context)
+        public ContentController(IContentAdderService contentAdderService, IContentGetterService contentGetterService, IContentUpdaterService contentUpdaterService, ICategoryItemGetterService categoryItemGetterService)
         {
-            _context = context;
+            _contentAdderService = contentAdderService;
+            _contentGetterService = contentGetterService;
+            _contentUpdaterService = contentUpdaterService;
+            _categoryItemGetterService = categoryItemGetterService;
         }
 
         // GET: Admin/Content/Create
@@ -28,7 +35,7 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         {
             Content content = new Content
             {
-                CatItemId = categoryItemId,
+                CategoryItemId = categoryItemId,
                 CategoryId = categoryId
             };
 
@@ -44,9 +51,8 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                content.CategoryItem = await _context.CategoryItem.FindAsync(content.CatItemId); //N
-                _context.Add(content);
-                await _context.SaveChangesAsync(); //After Add AddRange etc: must save db
+                content.CategoryItem = await _categoryItemGetterService.GetCategoryItemById(content.CategoryItemId);
+                await _contentAdderService.AddContent(content);
                 return RedirectToAction(nameof(Index), "CategoryItem", new { categoryId = content.CategoryId }); //(action, controller, value)
             }
             return View(content);
@@ -59,7 +65,7 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            var content = await _context.Content.SingleOrDefaultAsync(item => item.CategoryItem.Id == categoryItemId); // Content related to the categoryItem
+            var content = await _contentGetterService.GetContentByCategoryItemID(categoryItemId);
             content.CategoryId = categoryId;
             if (content == null)
             {
@@ -84,12 +90,12 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(content);
-                    await _context.SaveChangesAsync();
+                    await _contentUpdaterService.UpdateContent(content);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ContentExists(content.Id))
+                    var existingContent = await _contentGetterService.GetContentByID(content.Id);
+                    if (existingContent == null)
                     {
                         return NotFound();
                     }
@@ -101,18 +107,6 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index), "CategoryItem", new { categoryId = content.CategoryId }); /// TOO
             }
             return View(content);
-        }
-        private bool ContentExists(int id)
-        {
-            return _context.Content.Any(e => e.Id == id);
-        }
-        public static void DeleteCall(int categoryId, ApplicationDbContext _context) // Call for CategoryItemController
-        {
-            foreach (Content content in _context.Content)
-            {
-                if (content.CategoryId == categoryId)
-                    _context.Content.Remove(content);
-            }
         }
     }
 }

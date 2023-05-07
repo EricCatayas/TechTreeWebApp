@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TechTreeWebApp.Data;
 using TechTreeWebApp.Entities;
+using TechTreeWebApp.ServiceContracts;
 
 namespace TechTreeWebApp.Areas.Admin.Controllers
 {
@@ -15,29 +16,34 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class CategoryController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICategoriesAdderService _categoriesAdderService;
+        private readonly ICategoriesGetterService _categoriesGetterService;
+        private readonly ICategoriesDeleterService _categoriesDeleterService;
+        private readonly ICategoriesUpdaterService _categoriesUpdaterService;
 
-        public CategoryController(ApplicationDbContext context)
+        public CategoryController(ApplicationDbContext context, ICategoriesAdderService categoriesAdderService, ICategoriesGetterService categoriesGetterService, ICategoriesDeleterService categoriesDeleterService, ICategoriesUpdaterService categoriesUpdaterService)
         {
-            _context = context;
+            _categoriesAdderService = categoriesAdderService;
+            _categoriesGetterService = categoriesGetterService;
+            _categoriesDeleterService = categoriesDeleterService;
+            _categoriesUpdaterService = categoriesUpdaterService;
         }
 
         // GET: Admin/Category
         public async Task<IActionResult> Index()
         {
-              return View(await _context.Category.ToListAsync());
+              return View(await _categoriesGetterService.GetAllCategories());
         }
 
         // GET: Admin/Category/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Category == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Category
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var category = await _categoriesGetterService.GetCategoryById(id);
             if (category == null)
             {
                 return NotFound();
@@ -61,8 +67,7 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
-                await _context.SaveChangesAsync();
+                await _categoriesAdderService.AddCategory(category);
                 return RedirectToAction(nameof(Index));
             }
             return View(category);
@@ -71,12 +76,12 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         // GET: Admin/Category/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Category == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Category.FindAsync(id);
+            var category = await _categoriesGetterService.GetCategoryById(id);
             if (category == null)
             {
                 return NotFound();
@@ -100,19 +105,11 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
+                    await _categoriesUpdaterService.UpdateCategory(category);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -122,13 +119,12 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         // GET: Admin/Category/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Category == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Category
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var category = await _categoriesGetterService.GetCategoryById(id);
             if (category == null)
             {
                 return NotFound();
@@ -142,26 +138,14 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Category == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.Category'  is null.");
-            }
-            var category = await _context.Category.FindAsync(id);
-            
+            var category = await _categoriesGetterService.GetCategoryById(id);
+
             if (category != null)
             {
-                // Removing categoryItem manually   
-                CategoryItemController.DeleteCall(category.Id, _context);
-                _context.Category.Remove(category);                
+                await _categoriesDeleterService.DeleteCategory(category);
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool CategoryExists(int id)
-        {
-          return _context.Category.Any(e => e.Id == id);
         }
     }
 }

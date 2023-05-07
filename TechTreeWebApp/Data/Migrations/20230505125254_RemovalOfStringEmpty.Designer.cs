@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TechTreeWebApp.Data;
 
@@ -11,9 +12,10 @@ using TechTreeWebApp.Data;
 namespace TechTreeWebApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230505125254_RemovalOfStringEmpty")]
+    partial class RemovalOfStringEmpty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -280,12 +282,6 @@ namespace TechTreeWebApp.Data.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CategoryItemId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ContentId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("DateItemReleased")
                         .HasColumnType("datetime2");
 
@@ -301,8 +297,6 @@ namespace TechTreeWebApp.Data.Migrations
                         .HasColumnType("nvarchar(150)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("MediaTypeId");
 
@@ -320,9 +314,6 @@ namespace TechTreeWebApp.Data.Migrations
                     b.Property<int?>("CategoryItemId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ContentId")
-                        .HasColumnType("int");
-
                     b.Property<string>("HTMLContent")
                         .HasColumnType("nvarchar(max)");
 
@@ -336,9 +327,7 @@ namespace TechTreeWebApp.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryItemId")
-                        .IsUnique()
-                        .HasFilter("[CategoryItemId] IS NOT NULL");
+                    b.HasIndex("CategoryItemId");
 
                     b.ToTable("Content");
                 });
@@ -379,8 +368,6 @@ namespace TechTreeWebApp.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("UserId");
 
@@ -440,39 +427,24 @@ namespace TechTreeWebApp.Data.Migrations
 
             modelBuilder.Entity("TechTreeWebApp.Entities.CategoryItem", b =>
                 {
-                    b.HasOne("TechTreeWebApp.Entities.Category", "Category")
-                        .WithMany("CategoryItems")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("TechTreeWebApp.Entities.MediaType", null)
                         .WithMany("CategoryItems")
                         .HasForeignKey("MediaTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("TechTreeWebApp.Entities.Content", b =>
                 {
                     b.HasOne("TechTreeWebApp.Entities.CategoryItem", "CategoryItem")
-                        .WithOne("Content")
-                        .HasForeignKey("TechTreeWebApp.Entities.Content", "CategoryItemId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany()
+                        .HasForeignKey("CategoryItemId");
 
                     b.Navigation("CategoryItem");
                 });
 
             modelBuilder.Entity("TechTreeWebApp.Entities.UserCategory", b =>
                 {
-                    b.HasOne("TechTreeWebApp.Entities.Category", null)
-                        .WithMany("UserCategories")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("TechTreeWebApp.Data.ApplicationUser", null)
                         .WithMany("UserCategories")
                         .HasForeignKey("UserId");
@@ -481,18 +453,6 @@ namespace TechTreeWebApp.Data.Migrations
             modelBuilder.Entity("TechTreeWebApp.Data.ApplicationUser", b =>
                 {
                     b.Navigation("UserCategories");
-                });
-
-            modelBuilder.Entity("TechTreeWebApp.Entities.Category", b =>
-                {
-                    b.Navigation("CategoryItems");
-
-                    b.Navigation("UserCategories");
-                });
-
-            modelBuilder.Entity("TechTreeWebApp.Entities.CategoryItem", b =>
-                {
-                    b.Navigation("Content");
                 });
 
             modelBuilder.Entity("TechTreeWebApp.Entities.MediaType", b =>

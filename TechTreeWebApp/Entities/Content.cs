@@ -7,14 +7,14 @@ namespace TechTreeWebApp.Entities
     {
         public int Id { get; set; }
         [Required][StringLength(150, MinimumLength = 2)] 
-        public string Title { get; set; } = string.Empty;
+        public string? Title { get; set; } 
         [Display(Name = "Html Link")]
-        public string HTMLContent { get; set; } = string.Empty;
+        public string? HTMLContent { get; set; } 
         [Display(Name = "Video Link")]
-        public string VideoLink { get; set; } = string.Empty;
-        public CategoryItem? CategoryItem { get; set; } //Establishing one-to-one relationship
-        [NotMapped]// Not mapped to the fields of the same name -- Removed [NotMapped] because I cannot retrievee content.CategoryItem.Id in ContentController.Index() -- Lol! Logic Error hehe somehow
-        public int CatItemId { get; set;}
+        public string? VideoLink { get; set; }
+        [ForeignKey("ContentId")]
+        public virtual CategoryItem? CategoryItem { get; set; } //Establishing one-to-one relationship
+        public int? CategoryItemId { get; set;}
         //N: This property cannot be 
         //named CategoryItemId because this would
         //interfere with future migrations

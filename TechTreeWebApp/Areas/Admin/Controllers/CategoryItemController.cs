@@ -5,6 +5,7 @@ using System.Data;
 using TechTreeWebApp.Data;
 using TechTreeWebApp.Entities;
 using TechTreeWebApp.Extentions;
+using TechTreeWebApp.ServiceContracts;
 
 namespace TechTreeWebApp.Areas.Admin.Controllers
 {
@@ -12,33 +13,26 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")] //Prevents unauthorized users from entering 
     public class CategoryItemController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICategoryItemAdderService _categoryItemAdderService;
+        private readonly ICategoryItemGetterService _categoryItemGetterService;
+        private readonly ICategoryItemDeleterService _categoryItemDeleterService;
+        private readonly ICategoryItemUpdaterService _categoryItemUpdaterService;
+        private readonly IMediaTypeGetterService _mediaTypeGetterService;
 
-        public CategoryItemController(ApplicationDbContext context)
+        public CategoryItemController(ICategoryItemAdderService categoryItemAdderService, ICategoryItemGetterService categoryItemGetterService, ICategoryItemDeleterService categoryItemDeleterService, ICategoryItemUpdaterService categoryItemUpdaterService, IMediaTypeGetterService mediaTypeGetterService)
         {
-            _context = context;
+            _categoryItemAdderService = categoryItemAdderService;
+            _categoryItemGetterService = categoryItemGetterService;
+            _mediaTypeGetterService = mediaTypeGetterService;
+            _categoryItemDeleterService = categoryItemDeleterService;
+            _categoryItemUpdaterService = categoryItemUpdaterService;
         }
 
         // GET: Admin/CategoryItem
         public async Task<IActionResult> Index(int categoryId)
         {
             // Ex: Category "C# for beginners,  Categoryitem "data variables, methods, etc"
-            List<CategoryItem> categoryItems = await (from CatItem in _context.CategoryItem
-                                                      join contentItem in _context.Content    
-                                                      on CatItem.Id equals contentItem.CategoryItem.Id   // CAtegoryItem "Foreign Key" in Content
-                                                      into gj                                            // Then C: a group for the contentItems related to the CategoryItem
-                                                      from subContent in gj.DefaultIfEmpty()             // Select into an obj "subContent" -- set to null if CategoryItem does not content
-                                                      where CatItem.CategoryId == categoryId
-                                                      select new CategoryItem
-                                                      {
-                                                          Id = CatItem.Id,
-                                                          CategoryId = categoryId,
-                                                          Title = CatItem.Title,
-                                                          Description = CatItem.Description,
-                                                          MediaTypeId = CatItem.MediaTypeId,
-                                                          DateItemReleased = CatItem.DateItemReleased,
-                                                          ContentId = (subContent != null)? subContent.Id : 0 // if !null, navigate to Edit() else navigate to Create() in ContentControll
-                                                      }).ToListAsync();
+            List<CategoryItem>? categoryItems = await _categoryItemGetterService.GetCategoryItemByCategoryId(categoryId);
             ViewBag.CategoryId = categoryId;
               return View(categoryItems);
         }
@@ -46,13 +40,12 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         // GET: Admin/CategoryItem/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.CategoryItem == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var categoryItem = await _context.CategoryItem
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var categoryItem = await _categoryItemGetterService.GetCategoryItemById(id);
             if (categoryItem == null)
             {
                 return NotFound();
@@ -66,11 +59,11 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         //      the relevant Action Method Field contained within the CAtegoryItem controll class, then saved to the db
         public async Task<IActionResult> Create(int categoryId)
         {
-            List<MediaType> mediaTypes = await _context.MediaType.ToListAsync();
+            List<MediaType>? mediaTypes = await _mediaTypeGetterService.GetMediaTypes();
             CategoryItem categoryItem = new CategoryItem
             {
                 CategoryId = categoryId,
-                MediaTypes = mediaTypes.ConvertToSelectList(0) //by default first elem is displayed
+                MediaTypes = mediaTypes?.ConvertToSelectList(0) //by default first elem is displayed
             };
             return View(categoryItem);
         }
@@ -84,12 +77,11 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(categoryItem);
-                await _context.SaveChangesAsync();
+                await _categoryItemAdderService.AddCategoryItem(categoryItem);
                 return RedirectToAction(nameof(Index), new { categoryId = categoryItem.CategoryId }); //Forgor this?
             }
-            List<MediaType> mediaTypes = await _context.MediaType.ToListAsync(); //The user can reselect the Default item in dropdown list -- The videoItem and article must be restricted , when the Create view is displayed
-            categoryItem.MediaTypes = mediaTypes.ConvertToSelectList(categoryItem.MediaTypeId);
+            List<MediaType>? mediaTypes = await _mediaTypeGetterService.GetMediaTypes(); //The user can reselect the Default item in dropdown list -- The videoItem and article must be restricted , when the Create view is displayed
+            categoryItem.MediaTypes = mediaTypes?.ConvertToSelectList(categoryItem.MediaTypeId);
 
             return View(categoryItem);
         }
@@ -97,17 +89,17 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         // GET: Admin/CategoryItem/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.CategoryItem == null)
+            if (id == null)
             {
                 return NotFound();
             }
-            List<MediaType> mediaTypes = await _context.MediaType.ToListAsync();
-            var categoryItem = await _context.CategoryItem.FindAsync(id); // finds the relevant categoryItem data from db
+            List<MediaType>? mediaTypes = await _mediaTypeGetterService.GetMediaTypes();
+            var categoryItem = await _categoryItemGetterService.GetCategoryItemById(id); // finds the relevant categoryItem data from db
             if (categoryItem == null)
             {
                 return NotFound();
             }
-            categoryItem.MediaTypes = mediaTypes.ConvertToSelectList(categoryItem.MediaTypeId);
+            categoryItem.MediaTypes = mediaTypes?.ConvertToSelectList(categoryItem.MediaTypeId);
             return View(categoryItem);
         }
 
@@ -127,19 +119,11 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(categoryItem);
-                    await _context.SaveChangesAsync();
+                    await _categoryItemUpdaterService.UpdateCategoryItem(categoryItem);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryItemExists(categoryItem.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
                 return RedirectToAction(nameof(Index), new {categoryId = categoryItem.CategoryId}); // when redirected to Index.cshtml, the list of categoryItems related to the Category will be presented
             }
@@ -149,12 +133,12 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         // GET: Admin/CategoryItem/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.CategoryItem == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var categoryItem = await _context.CategoryItem.FirstOrDefaultAsync(m => m.Id == id);            
+            var categoryItem = await _categoryItemGetterService.GetCategoryItemById(id);       
             if (categoryItem == null)
             {
                 return NotFound();
@@ -168,34 +152,12 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.CategoryItem == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.CategoryItem'  is null.");
-            }
-            var categoryItem = await _context.CategoryItem.FindAsync(id);
+            var categoryItem = await _categoryItemGetterService.GetCategoryItemById(id);
             if (categoryItem != null)
             {
-                ContentController.DeleteCall(categoryItem.CategoryId, _context);
-                _context.CategoryItem.Remove(categoryItem);
+                await _categoryItemDeleterService.DeleteCategoryItem(categoryItem);
             }
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index), new {categoryId = categoryItem.CategoryId});
-        }
-
-        public static void DeleteCall(int categoryId, ApplicationDbContext _context) // Call fOR CategoryController
-        {
-            foreach(CategoryItem categoryItem in _context.CategoryItem)
-            {
-                if (categoryItem.CategoryId == categoryId)
-                    _context.CategoryItem.Remove(categoryItem);
-            }
-            ContentController.DeleteCall(categoryId, _context);
-
-        }
-
-        private bool CategoryItemExists(int id)
-        {
-          return _context.CategoryItem.Any(e => e.Id == id);
         }
     }
 }

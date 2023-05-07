@@ -1,29 +1,56 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TechTreeWebApp.Data;
+using TechTreeWebApp.ServiceContracts;
+using TechTreeWebApp.Services;
 
-// Builder Contains IConfiguration
+/* TODO
+    
+    define connection string as environment variable
+    Define admin demo account for users -- login
+    Email functionality -- from WebPortfolio
+    
+    Admin Acc: maggot@email.com  _MagSci456
+    Normal:    catayasericjay@gmail.com _MagSci456  
+ */
 var builder = WebApplication.CreateBuilder(args); 
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection"); 
+
 // .AddDbContext(What type of code is our db using?);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 // M:AddDefaultIdentity<ApplicationUser>
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false) //switched to false
-    .AddRoles<IdentityRole>() //D: Roles of User as part of the authentication of the MVC
+    .AddRoles<IdentityRole>() 
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
 /* Add our custom class with the .Net Core Dependency Injection so that we can reuse code within the Registered type throughout multiple control classes*/
 builder.Services.AddScoped<IDataFunctions, DataFunctions>();
-// Registering DataFunctions.cs for Dependency Injec
-// AddTransient() -- But Factor: Object's Instanciation and Lifetime a new DataFunctions is instanciated everutime an IDataFunc() is injected -- a new object is created before a new object is injected  -- new instance to every controller and every service
-// AddSingleTon()-- created once even through multiple request
-// AddScope()  --  IDataFunctions is instanciated once when a new request in made; DataFunctions is available throughout the course of that single request until ejected -- different to every request
 
+builder.Services.AddScoped<ICategoryItemAdderService, CategoryItemAdderService>();
+builder.Services.AddScoped<ICategoryItemGetterService, CategoryItemGetterService>();
+builder.Services.AddScoped<ICategoryItemDeleterService, CategoryItemDeleterService>();
+builder.Services.AddScoped<ICategoryItemUpdaterService, CategoryItemUpdaterService>();
+
+builder.Services.AddScoped<ICategoriesAdderService, CategoriesAdderService>();
+builder.Services.AddScoped<ICategoriesGetterService, CategoriesGetterService>();
+builder.Services.AddScoped<ICategoriesDeleterService, CategoriesDeleterService>();
+builder.Services.AddScoped<ICategoriesUpdaterService, CategoriesUpdaterService>();
+builder.Services.AddScoped<ICategoriesToUserGetterServices, CategoriesToUserGetterService>();
+
+builder.Services.AddScoped<IContentAdderService, ContentAdderService>();
+builder.Services.AddScoped<IContentGetterService, ContentGetterService>();
+builder.Services.AddScoped<IContentUpdaterService, ContentUpdaterService>();
+
+builder.Services.AddScoped<IMediaTypeAdderService, MediaTypeAdderService>();
+builder.Services.AddScoped<IMediaTypeDeleterService, MediaTypeDeleterService>();
+builder.Services.AddScoped<IMediaTypeGetterService, MediaTypeGetterService>();
+builder.Services.AddScoped<IMediaTypeUpdaterService, MediaTypeUpdaterService>();
 
 var app = builder.Build();
 

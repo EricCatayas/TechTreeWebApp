@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TechTreeWebApp.Areas.Admin.Models;
+using TechTreeWebApp.Data;
 using TechTreeWebApp.Entities;
+using TechTreeWebApp.ServiceContracts;
 
-namespace TechTreeWebApp.Data
+namespace TechTreeWebApp.Services
 {
     public class DataFunctions : IDataFunctions
     {

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TechTreeWebApp.Data;
 using TechTreeWebApp.Entities;
 using System.Diagnostics;
+using TechTreeWebApp.ServiceContracts;
 
 namespace TechTreeWebApp.Controllers
 {
@@ -11,25 +12,15 @@ namespace TechTreeWebApp.Controllers
     /// </summary>
     public class ContentController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        public ContentController(ApplicationDbContext context)
+        private readonly IContentGetterService _contentService;
+        public ContentController(IContentGetterService contentService)
         {
-            _context = context;
+            _contentService = contentService;
         }
         public async Task<IActionResult> Index(int categoryItemId)
         {
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-            //var content = await _context.Content.SingleOrDefaultAsync(item => item.CategoryItem.Id == categoryItemId).
-            Content content = await (from _content in _context.Content
-                                     where _content.CategoryItem.Id == categoryItemId //Mistake: _content.CatItemId when the specified member is unmapped
-                                     select new Content
-                                     {
-                                         Title = _content.Title,
-                                         VideoLink = _content.VideoLink,
-                                         HTMLContent = _content.HTMLContent,
-                                     }).FirstOrDefaultAsync();
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
-            return View(content); //// Because of naming convention inherent in the MVC framework; MVC knows this Controller invokes Content.Index.cshtml in Views despite being defined separately from the Razor view
+            Content content = await _contentService.GetContentByCategoryItemID(categoryItemId);
+            return View(content); 
         }
     }
 }

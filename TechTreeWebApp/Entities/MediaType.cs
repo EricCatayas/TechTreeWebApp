@@ -8,9 +8,9 @@ namespace TechTreeWebApp.Entities
     {
         public int Id { get; set; }
         [Required][StringLength(150, MinimumLength = 2)]
-        public string Title { get; set; } = string.Empty;
+        public string? Title { get; set; } 
         [Display(Name = "Thumbnail Image Path")]
-        public string ThumbnailImagePath { get; set; } = string.Empty;
+        public string? ThumbnailImagePath { get; set; } 
         [ForeignKey("MediaTypeId")]
         public virtual ICollection<CategoryItem>? CategoryItems { get; set; }
     }

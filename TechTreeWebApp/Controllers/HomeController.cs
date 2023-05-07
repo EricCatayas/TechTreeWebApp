@@ -5,6 +5,7 @@ using System.Diagnostics;
 using TechTreeWebApp.Data;
 using TechTreeWebApp.Entities;
 using TechTreeWebApp.Models;
+using TechTreeWebApp.ServiceContracts;
 
 namespace TechTreeWebApp.Controllers
 {
@@ -12,15 +13,17 @@ namespace TechTreeWebApp.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context;
+        private readonly ICategoriesToUserGetterServices _categoriesGetterServices;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, ICategoriesToUserGetterServices categoriesGetterServices,  SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
         { // passing via Dependency Injection
             _logger = logger;
             _signInManager = signInManager;
             _userManager = userManager;
             _context = context;
+            _categoriesGetterServices = categoriesGetterServices;
         }
 
         public async Task<IActionResult> Index()
@@ -40,7 +43,7 @@ namespace TechTreeWebApp.Controllers
             }
             else
             {
-                categoryDetailsModel.Categories = await GetCategoriesThatHaveContent();
+                categoryDetailsModel.Categories = await _categoriesGetterServices.GetCategoriesThatHaveContent();
             }
             
             return View(categoryDetailsModel);
@@ -56,7 +59,7 @@ namespace TechTreeWebApp.Controllers
                           on category.Id equals userCat.CategoryId
                           join mediaType in _context.MediaType
                           on catItem.MediaTypeId equals mediaType.Id
-                          where userCat.UserId == userId         //check
+                          where userCat.UserId == userId         
                           select new CategoryItemDetailsModel
                           {
                               CategoryId = category.Id,
@@ -66,24 +69,6 @@ namespace TechTreeWebApp.Controllers
                               CategoryItemDescription = catItem.Description,
                               MediaImagePath = mediaType.ThumbnailImagePath
                           }).ToListAsync();
-        }
-        // LinqQuery Categories currently saved to the system that atleast has one categoryItem which atleast has one content
-        private async Task<List<Category>> GetCategoriesThatHaveContent()
-        {
-            var categories = await (from category in _context.Category
-                                    join categoryItem in _context.CategoryItem
-                                    on category.Id equals categoryItem.CategoryId
-                                    join content in _context.Content
-                                    on categoryItem.Id equals content.CategoryItem.Id
-                                    select new Category
-                                    {
-                                        Id = category.Id,
-                                        Title = category.Title,
-                                        Description = category.Description,
-                                        ThumbnailImagePath = category.ThumbnailImagePath,
-                                    }).Distinct().ToListAsync(); //	Distinct() ensures that one row per category is returned within the result
-
-            return categories;
         }
         private IEnumerable<GroupedCategoryItemsByCategoryModel> GetGroupedCategoryItemsByCategoryModels(IEnumerable<CategoryItemDetailsModel> categoryItemDetailsModel)
         {

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TechTreeWebApp.Data;
 using TechTreeWebApp.Entities;
+using TechTreeWebApp.ServiceContracts;
 
 namespace TechTreeWebApp.Areas.Admin.Controllers
 {
@@ -16,29 +17,34 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class MediaTypeController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IMediaTypeAdderService _mediaTypeAdderService;
+        private readonly IMediaTypeGetterService _mediaTypeGetterService;
+        private readonly IMediaTypeDeleterService _mediaTypeDeleterService;
+        private readonly IMediaTypeUpdaterService _mediaTypeUpdaterService;
 
-        public MediaTypeController(ApplicationDbContext context)
+        public MediaTypeController(IMediaTypeAdderService mediaTypeAdderService, IMediaTypeGetterService mediaTypeGetterService, IMediaTypeDeleterService mediaTypeDeleterService, IMediaTypeUpdaterService mediaTypeUpdaterService)
         {
-            _context = context;
+            _mediaTypeAdderService = mediaTypeAdderService;
+            _mediaTypeGetterService = mediaTypeGetterService;
+            _mediaTypeDeleterService = mediaTypeDeleterService;
+            _mediaTypeUpdaterService = mediaTypeUpdaterService;
         }
 
         // GET: Admin/MediaType
         public async Task<IActionResult> Index()
         {
-              return View(await _context.MediaType.ToListAsync());
+              return View(await _mediaTypeGetterService.GetMediaTypes());
         }
 
         // GET: Admin/MediaType/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.MediaType == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var mediaType = await _context.MediaType
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var mediaType = await _mediaTypeGetterService.GetMediaTypeById(id);
             if (mediaType == null)
             {
                 return NotFound();
@@ -62,8 +68,7 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(mediaType);
-                await _context.SaveChangesAsync();
+                await _mediaTypeAdderService.AddMediaType(mediaType);
                 return RedirectToAction(nameof(Index));
             }
             return View(mediaType);
@@ -72,12 +77,12 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         // GET: Admin/MediaType/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.MediaType == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var mediaType = await _context.MediaType.FindAsync(id);
+            var mediaType = await _mediaTypeGetterService.GetMediaTypeById(id);
             if (mediaType == null)
             {
                 return NotFound();
@@ -101,12 +106,12 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(mediaType);
-                    await _context.SaveChangesAsync();
+                    await _mediaTypeUpdaterService.UpdateMediaType(mediaType);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MediaTypeExists(mediaType.Id))
+                    var existingMediaType = await _mediaTypeGetterService.GetMediaTypeById(mediaType.Id);
+                    if (existingMediaType == null)
                     {
                         return NotFound();
                     }
@@ -123,13 +128,12 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         // GET: Admin/MediaType/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.MediaType == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var mediaType = await _context.MediaType
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var mediaType = await _mediaTypeGetterService.GetMediaTypeById(id);
             if (mediaType == null)
             {
                 return NotFound();
@@ -143,23 +147,14 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.MediaType == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.MediaType'  is null.");
-            }
-            var mediaType = await _context.MediaType.FindAsync(id);
+            var mediaType = await _mediaTypeGetterService.GetMediaTypeById(id);
             if (mediaType != null)
             {
-                _context.MediaType.Remove(mediaType);
+                await _mediaTypeDeleterService.DeleteMediaType(mediaType);
             }
             
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool MediaTypeExists(int id)
-        {
-          return _context.MediaType.Any(e => e.Id == id);
-        }
     }
 }
