@@ -1,23 +1,24 @@
 ﻿@using Microsoft.AspNetCore.Identity;
 @using TechTreeWebApp.Data
 @inject SignInManager<ApplicationUser> signInManager;
+@inject UserManager<ApplicationUser> UserManager;
 @model CategoryDetailsModel;
 
 @{
     ViewData["Title"] = "Home Page";
 }
-@if (signInManager.IsSignedIn(User))
+@if (signInManager.IsSignedIn(User) && await UserManager.IsInRoleAsync(UserManager.GetUserAsync(User).Result, "admin"))
 {
     <div class="text-center">
         <h1 class="display-4">Welcome to TechTree!</h1>
     </div>
     <div class="row mt-5">
         <div class="col-md-6">
-            <h2>Your Courses</h2>
-            <a asp-controller="CategoriesToUser" asp-action="Index" class="btn btn-outline-dark"> Choose your Courses</a> 
+            <h2>All Courses</h2>
+            <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="btn btn-outline-dark">Manage Courses</a>
         </div>
     </div>      <!-- Your Courses Section-->
-    @if (Model.GroupedCategoryItemsByCategoryModels.Count() > 0) 
+    @if (Model.GroupedCategoryItemsByCategoryModels.Count() > 0)
     {
 
         <div class="row mt-3">
@@ -55,46 +56,6 @@
     }
     else
     {
-        <h4 class="mt-2 text-warning">You are currently not matched with any courses</h4>
+        <h4 class="mt-2 text-warning">There are currently no courses saved in the system.</h4>
     }
 } 
-else
-{
-    <partial name="_DefaultHomePageContentPartial" model="@Model.Categories"></partial>
-}
-
-
-
-<div class="modal fade" id="UserLoginModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <!-- our Home.Index.cshtml then became strongly-typed for CategoryDetailsModel; _UserLoginPartial and _UserRegistrationPartial NOW requires a model -->
-    <partial name="_UserLoginPartial" model="new LoginModel
-    {
-        Email = string.Empty,
-        Password = string.Empty,
-        RememberMe = false
-    }        
-    "></partial> <!-- we can update the contents of this div element using jquery code-->
-</div>
-<div class="modal fade" id="UserRegistrationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <partial name="_UserRegistrationPartial" model="new RegistrationModel
-        {
-            Email = String.Empty,
-            Password = String.Empty,
-            ConfirmPassword = String.Empty,
-            FirstName = String.Empty,
-            LastName = String.Empty,
-            PhoneNumber = String.Empty,
-            Address1 = String.Empty,
-            Address2 = String.Empty,
-            PostCode = String.Empty,
-            AcceptTermsAndAgreement = false
-        }" />
-</div>
-
-@section Scripts{
-    <script src="~/js/email-service.js"></script>
-    @{
-        await Html.RenderPartialAsync("_AutoScriptsPartial"); <!-- using statements for js included here -->
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

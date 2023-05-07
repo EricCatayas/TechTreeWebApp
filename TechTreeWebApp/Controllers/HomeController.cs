@@ -1,31 +1,37 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using TechTreeWebApp.Data;
 using TechTreeWebApp.Entities;
+using TechTreeWebApp.Extentions;
+using TechTreeWebApp.Filters;
 using TechTreeWebApp.Models;
 using TechTreeWebApp.ServiceContracts;
+using TechTreeWebApp.Services;
 
 namespace TechTreeWebApp.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly ApplicationDbContext _context;
+        private readonly ICategoryItemDetailsGetterService _categoryItemDetailsGetterService;
         private readonly ICategoriesToUserGetterServices _categoriesGetterServices;
+        private readonly IEmailService _emailService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, ICategoriesToUserGetterServices categoriesGetterServices,  SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
+        public HomeController(ILogger<HomeController> logger, ICategoryItemDetailsGetterService categoryItemDetailsGetterService, ICategoriesToUserGetterServices categoriesGetterServices,   SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IEmailService emailService)
         { // passing via Dependency Injection
             _logger = logger;
             _signInManager = signInManager;
             _userManager = userManager;
-            _context = context;
+            _categoryItemDetailsGetterService = categoryItemDetailsGetterService;
             _categoriesGetterServices = categoriesGetterServices;
+            _emailService = emailService;
         }
-
+        [TypeFilter(typeof(AdminAreaAuthorizationFilter))]
         public async Task<IActionResult> Index()
         {
             CategoryDetailsModel categoryDetailsModel = new();
@@ -34,8 +40,8 @@ namespace TechTreeWebApp.Controllers
                 var userId = _userManager.GetUserId(User);
                 if (userId != null)
                 {
-                    IEnumerable<CategoryItemDetailsModel> categoryItemDetailsModels = await GetCategoryItemDetailsForUser(userId);
-                    IEnumerable<GroupedCategoryItemsByCategoryModel> groupedCategoryItemsByCategoryModels = GetGroupedCategoryItemsByCategoryModels(categoryItemDetailsModels);
+                    IEnumerable<CategoryItemDetailsModel> categoryItemDetailsModels = await _categoryItemDetailsGetterService.GetCategoryItemDetailsForUser(userId);
+                    IEnumerable<GroupedCategoryItemsByCategoryModel> groupedCategoryItemsByCategoryModels = categoryItemDetailsModels.GetGroupedCategoryItemsByCategoryModels();
 
                     categoryDetailsModel.GroupedCategoryItemsByCategoryModels = groupedCategoryItemsByCategoryModels;
                     return View(categoryDetailsModel);
@@ -48,39 +54,13 @@ namespace TechTreeWebApp.Controllers
             
             return View(categoryDetailsModel);
         }
-        private async Task<IEnumerable<CategoryItemDetailsModel>> GetCategoryItemDetailsForUser(string userId)
+        [Route("[controller]/[action]")]
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> SendEmail(string recipientEmail, string name, string body)
         {
-            return await (from catItem in _context.CategoryItem
-                          join category in _context.Category
-                          on catItem.CategoryId equals category.Id
-                          join content in _context.Content
-                          on catItem.Id equals content.CategoryItem.Id
-                          join userCat in _context.UserCategory
-                          on category.Id equals userCat.CategoryId
-                          join mediaType in _context.MediaType
-                          on catItem.MediaTypeId equals mediaType.Id
-                          where userCat.UserId == userId         
-                          select new CategoryItemDetailsModel
-                          {
-                              CategoryId = category.Id,
-                              CategoryTitle = category.Title,
-                              CategoryItemId = catItem.Id,
-                              CategoryItemTitle = catItem.Title,
-                              CategoryItemDescription = catItem.Description,
-                              MediaImagePath = mediaType.ThumbnailImagePath
-                          }).ToListAsync();
-        }
-        private IEnumerable<GroupedCategoryItemsByCategoryModel> GetGroupedCategoryItemsByCategoryModels(IEnumerable<CategoryItemDetailsModel> categoryItemDetailsModel)
-        {
-            return (from item in categoryItemDetailsModel
-                    group item by item.CategoryId into g
-                    select new GroupedCategoryItemsByCategoryModel
-                    {
-                        Id = g.Key,
-                        Title = g.Select(c => c.CategoryTitle).FirstOrDefault(),
-                        Items = g
-                    });
-
+            bool success = await _emailService.SendEmail(recipientEmail, name, body);
+            return success ? StatusCode(200) : StatusCode(500);
         }
         public IActionResult Privacy() 
         {

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TechTreeWebApp.Data;
+using TechTreeWebApp.Filters;
 using TechTreeWebApp.ServiceContracts;
 using TechTreeWebApp.Services;
 
@@ -31,6 +32,8 @@ builder.Services.AddControllersWithViews();
 
 /* Add our custom class with the .Net Core Dependency Injection so that we can reuse code within the Registered type throughout multiple control classes*/
 builder.Services.AddScoped<IDataFunctions, DataFunctions>();
+builder.Services.AddScoped<ICategoryItemDetailsGetterService, CategoryItemDetailsGetterService>();
+builder.Services.AddScoped<IEmailService,EmailService>();
 
 builder.Services.AddScoped<ICategoryItemAdderService, CategoryItemAdderService>();
 builder.Services.AddScoped<ICategoryItemGetterService, CategoryItemGetterService>();
@@ -52,6 +55,7 @@ builder.Services.AddScoped<IMediaTypeDeleterService, MediaTypeDeleterService>();
 builder.Services.AddScoped<IMediaTypeGetterService, MediaTypeGetterService>();
 builder.Services.AddScoped<IMediaTypeUpdaterService, MediaTypeUpdaterService>();
 
+// builder.Services.AddScoped<AdminHomeAuthorizationFilter>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

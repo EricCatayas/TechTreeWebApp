@@ -7,7 +7,7 @@
         @foreach (var category in Model)
         {
             <div class="col-md-3">
-                 <a href="#" class="RegisterLink text-dark" data-categoryId="@category.Id"> @* data-categoryId is an attribute we can use to store and get the categoryId *@
+                 <a href="#" class="RegisterLink text-dark" data-categoryId="@category.Id" style="text-decoration: none;"> @* data-categoryId is an attribute we can use to store and get the categoryId *@
                     <div class="card">
                         <img class="img-thumbnail" src="@category.ThumbnailImagePath" alt="@category.Title" />
                         <div class="card-body">

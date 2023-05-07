@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using TechTreeWebApp.Interfaces;
+using TechTreeWebApp.Models;
 
 namespace TechTreeWebApp.Extentions
 {
@@ -14,6 +15,17 @@ namespace TechTreeWebApp.Extentions
                         Value = item.Id.ToString(),
                         Selected = (item.Id == selectedValue)
                     }).ToList();
+        }
+        public static IEnumerable<GroupedCategoryItemsByCategoryModel> GetGroupedCategoryItemsByCategoryModels(this IEnumerable<CategoryItemDetailsModel> categoryItemDetailsModels)
+        {
+            return (from item in categoryItemDetailsModels
+                    group item by item.CategoryId into g
+                    select new GroupedCategoryItemsByCategoryModel
+                    {
+                        Id = g.Key,
+                        Title = g.Select(c => c.CategoryTitle).FirstOrDefault(),
+                        Items = g
+                    });
         }
     }
 }
