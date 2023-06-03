@@ -5,15 +5,7 @@ using TechTreeWebApp.Filters;
 using TechTreeWebApp.ServiceContracts;
 using TechTreeWebApp.Services;
 
-/* TODO
-    
-    define connection string as environment variable
-    Define admin demo account for users -- login
-    Email functionality -- from WebPortfolio
-    
-    Admin Acc: maggot@email.com  _MagSci456
-    Normal:    catayasericjay@gmail.com _MagSci456  
- */
+
 var builder = WebApplication.CreateBuilder(args); 
 
 // Add services to the container.
@@ -30,7 +22,6 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
-/* Add our custom class with the .Net Core Dependency Injection so that we can reuse code within the Registered type throughout multiple control classes*/
 builder.Services.AddScoped<IDataFunctions, DataFunctions>();
 builder.Services.AddScoped<ICategoryItemDetailsGetterService, CategoryItemDetailsGetterService>();
 builder.Services.AddScoped<IEmailService,EmailService>();
