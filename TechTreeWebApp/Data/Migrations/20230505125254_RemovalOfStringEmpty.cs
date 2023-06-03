@@ -60,55 +60,40 @@ namespace TechTreeWebApp.Data.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            migrationBuilder.AddColumn<string>(
                 name: "PostCode",
                 table: "AspNetUsers",
                 type: "nvarchar(30)",
                 maxLength: 30,
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(30)",
-                oldMaxLength: 30);
+                nullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            migrationBuilder.AddColumn<string>(
                 name: "LastName",
                 table: "AspNetUsers",
                 type: "nvarchar(150)",
                 maxLength: 150,
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(150)",
-                oldMaxLength: 150);
+                nullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+			migrationBuilder.AddColumn<string>(
                 name: "FirstName",
                 table: "AspNetUsers",
                 type: "nvarchar(150)",
                 maxLength: 150,
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(150)",
-                oldMaxLength: 150);
+                nullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            migrationBuilder.AddColumn<string>(
                 name: "Address2",
                 table: "AspNetUsers",
                 type: "nvarchar(150)",
                 maxLength: 150,
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(150)",
-                oldMaxLength: 150);
+                nullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            migrationBuilder.AddColumn<string>(
                 name: "Address1",
                 table: "AspNetUsers",
                 type: "nvarchar(150)",
                 maxLength: 150,
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(150)",
-                oldMaxLength: 150);
+                nullable: true);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_UserCategory_AspNetUsers_UserId",
@@ -184,65 +169,25 @@ namespace TechTreeWebApp.Data.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            migrationBuilder.DropColumn(
                 name: "PostCode",
-                table: "AspNetUsers",
-                type: "nvarchar(30)",
-                maxLength: 30,
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(30)",
-                oldMaxLength: 30,
-                oldNullable: true);
+                table: "AspNetUsers");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "LastName",
-                table: "AspNetUsers",
-                type: "nvarchar(150)",
-                maxLength: 150,
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(150)",
-                oldMaxLength: 150,
-                oldNullable: true);
+			migrationBuilder.DropColumn(
+			    name: "FirstName",
+			    table: "AspNetUsers");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "FirstName",
-                table: "AspNetUsers",
-                type: "nvarchar(150)",
-                maxLength: 150,
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(150)",
-                oldMaxLength: 150,
-                oldNullable: true);
+			migrationBuilder.DropColumn(
+				name: "LastName",
+				table: "AspNetUsers");
 
-            migrationBuilder.AlterColumn<string>(
+			migrationBuilder.DropColumn(
                 name: "Address2",
-                table: "AspNetUsers",
-                type: "nvarchar(150)",
-                maxLength: 150,
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(150)",
-                oldMaxLength: 150,
-                oldNullable: true);
+                table: "AspNetUsers");
 
-            migrationBuilder.AlterColumn<string>(
+            migrationBuilder.DropColumn(
                 name: "Address1",
-                table: "AspNetUsers",
-                type: "nvarchar(150)",
-                maxLength: 150,
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(150)",
-                oldMaxLength: 150,
-                oldNullable: true);
+                table: "AspNetUsers");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_UserCategory_AspNetUsers_UserId",

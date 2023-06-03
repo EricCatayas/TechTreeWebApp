@@ -15,11 +15,11 @@ namespace TechTreeWebApp.Data.Migrations
             //Inserting to AspNetUsers db in SQL
             // Add useraccount to system, then admin role to system , useraccount to the admin role
             var hasher = new PasswordHasher<ApplicationUser>(); //Used for verifying integrity of the password
-            var passwordHash = hasher.HashPassword(null, "MagSci456"); //TODO Hide Password
+            var passwordHash = hasher.HashPassword(null, "Admin1!"); //TODO Hide Password
 
             StringBuilder stringBuilder = new StringBuilder(); //Building the sql statement
 
-            stringBuilder.AppendLine("INSERT INTO AspNetUsers(Id, UserName, NormalizedUserName,Email,NormalizedEmail,PasswordHash,SecurityStamp,EmailConfirmed, PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnabled,AccessFailedCount,FirstName,LastName,Address1,Address2,PostCode)");
+            stringBuilder.AppendLine("INSERT INTO AspNetUsers(Id, UserName, NormalizedUserName,Email,NormalizedEmail,PasswordHash,SecurityStamp,EmailConfirmed, PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnabled,AccessFailedCount)");
             stringBuilder.AppendLine("VALUES(");
             stringBuilder.AppendLine($"'{ADMIN_USER_GUID}'");
             stringBuilder.AppendLine(",'catayasericjay@gmail.com'");
@@ -33,11 +33,11 @@ namespace TechTreeWebApp.Data.Migrations
             stringBuilder.AppendLine(", 0"); //Two Factor
             stringBuilder.AppendLine(", 0"); //LockOut Enabled
             stringBuilder.AppendLine(", 0");
-            stringBuilder.AppendLine(",'Admin'"); //First Name
+           /* stringBuilder.AppendLine(",'Admin'"); //First Name
             stringBuilder.AppendLine(",'Catayas'"); //Last Name
-            stringBuilder.AppendLine(",'0053'");
-            stringBuilder.AppendLine(",'Mahayahay Street, Gairan, Bogo City'");
-            stringBuilder.AppendLine(",'6010'");
+            stringBuilder.AppendLine(",'0053'"); //Address1
+            stringBuilder.AppendLine(",'Mahayahay Street, Gairan, Bogo City'"); //Address2
+            stringBuilder.AppendLine(",'6010'");*/ // Postal Code
             stringBuilder.AppendLine(")"); 
 
             migrationBuilder.Sql(stringBuilder.ToString());
