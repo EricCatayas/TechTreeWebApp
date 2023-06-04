@@ -14,7 +14,8 @@ namespace TechTreeWebApp.Services
         }
         public async Task UpdateContent(Content content)
         {
-            Content? content_ToUpdate = _context.Content.FirstOrDefault(temp=> temp.Id == content.Id);
+            Content? content_ToUpdate = _context.Content.FirstOrDefault(temp=> temp.Id == content.Id || temp.CategoryItemId == content.CategoryItemId);
+
             if (content_ToUpdate != null) 
             {
                 content_ToUpdate.HTMLContent = content.HTMLContent;

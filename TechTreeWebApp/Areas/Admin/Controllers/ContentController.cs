@@ -83,13 +83,8 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,HTMLContent,VideoLink,CategoryId")] Content content)
+        public async Task<IActionResult> Edit([Bind("Id,Title,HTMLContent,VideoLink,CategoryId,CategoryItemId")] Content content)
         {
-            if (id != content.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
                 try
