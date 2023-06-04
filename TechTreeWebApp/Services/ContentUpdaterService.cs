@@ -14,8 +14,15 @@ namespace TechTreeWebApp.Services
         }
         public async Task UpdateContent(Content content)
         {
-            _context.Update(content);
-            await _context.SaveChangesAsync();
+            Content? content_ToUpdate = _context.Content.FirstOrDefault(temp=> temp.Id == content.Id);
+            if (content_ToUpdate != null) 
+            {
+                content_ToUpdate.HTMLContent = content.HTMLContent;
+                content_ToUpdate.Title = content.Title;
+                content_ToUpdate.VideoLink = content.VideoLink;
+                _context.Update(content_ToUpdate);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

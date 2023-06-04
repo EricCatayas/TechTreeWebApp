@@ -14,8 +14,16 @@ namespace TechTreeWebApp.Services
         }
         public async Task UpdateCategoryItem(CategoryItem categoryItem)
         {
-            _context.Update(categoryItem);
-            await _context.SaveChangesAsync();
+            CategoryItem? categoryItem_ToUpdate = _context.CategoryItem.FirstOrDefault(temp=> temp.Id == categoryItem.Id);
+            if (categoryItem_ToUpdate != null) 
+            {
+                categoryItem_ToUpdate.Title = categoryItem.Title;
+                categoryItem_ToUpdate.Description = categoryItem.Description;
+                categoryItem_ToUpdate.DateItemReleased = categoryItem.DateItemReleased;
+                categoryItem_ToUpdate.MediaTypeId= categoryItem.MediaTypeId;
+                _context.Update(categoryItem_ToUpdate);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }
