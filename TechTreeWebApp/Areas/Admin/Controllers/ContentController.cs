@@ -29,7 +29,11 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
             _contentUpdaterService = contentUpdaterService;
             _categoryItemGetterService = categoryItemGetterService;
         }
-
+        public async Task<IActionResult> Index(int categoryItemId)
+        {
+            var content = await _contentGetterService.GetContentByCategoryItemID(categoryItemId);
+            return View(content);
+        }
         // GET: Admin/Content/Create
         public IActionResult Create(int categoryItemId, int categoryId)
         {
@@ -47,7 +51,7 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,HTMLContent,VideoLink, CatItemId, CategoryId")] Content content)
+        public async Task<IActionResult> Create([Bind("Id,Title,HTMLContent,VideoLink, CategoryItemId, CategoryId")] Content content)
         {
             if (ModelState.IsValid)
             {

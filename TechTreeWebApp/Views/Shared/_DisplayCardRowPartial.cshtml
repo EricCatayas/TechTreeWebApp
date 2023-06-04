@@ -12,7 +12,14 @@
                         <img class="img-thumbnail" src="@category.ThumbnailImagePath" alt="@category.Title" />
                         <div class="card-body">
                             <h5 class="card-title">@category.Title</h5>
-                            <p class="card-text">@category.Description</p>
+                            @if (category.Description.Length > 100)
+                            {
+                                <p class="card-text">@category.Description.Substring(0,100)...</p>
+                            }
+                            else
+                            {                                
+                                <p class="card-text">@category.Description</p>
+                            }
                         </div>
                     </div>
                  </a>

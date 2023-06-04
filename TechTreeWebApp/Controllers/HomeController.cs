@@ -4,12 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using TechTreeWebApp.Data;
-using TechTreeWebApp.Entities;
 using TechTreeWebApp.Extentions;
 using TechTreeWebApp.Filters;
 using TechTreeWebApp.Models;
 using TechTreeWebApp.ServiceContracts;
-using TechTreeWebApp.Services;
 
 namespace TechTreeWebApp.Controllers
 {

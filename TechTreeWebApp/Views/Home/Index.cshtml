@@ -5,6 +5,7 @@
 
 @{
     ViewData["Title"] = "Home Page";
+    const int descriptionLength = 100;
 }
 @if (signInManager.IsSignedIn(User))
 {
@@ -40,10 +41,19 @@
                                     <h5 class="card-title mt-2">
                                         <!-- En-route to ContentController public async Task<IActionResult> Index(int categoryItemId) -->
                                         <a class="text-dark" asp-controller="Content" asp-action="Index" asp-route-categoryItemId="@item.CategoryItemId">@item.CategoryItemTitle</a>
-                                    </h5>
-                                    <p class="card-text text-dark mt-2">
-                                        @item.CategoryItemDescription
-                                    </p>
+                                    </h5>                                    
+                                    @if (item.CategoryItemDescription.Length > descriptionLength)
+                                    {
+                                        <p class="card-text text-dark mt-2">
+                                            @item.CategoryItemDescription.Substring(0, descriptionLength)...
+                                        </p>
+                                    }
+                                    else
+                                    {
+                                        <p class="card-text text-dark mt-2">
+                                        @item.CategoryItemDescription          
+                                        </p>
+                                    }                                    
                                 </div>
                             }
                         </div>

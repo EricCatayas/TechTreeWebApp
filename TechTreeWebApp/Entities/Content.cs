@@ -12,7 +12,7 @@ namespace TechTreeWebApp.Entities
         public string? HTMLContent { get; set; } 
         [Display(Name = "Video Link")]
         public string? VideoLink { get; set; }
-        [ForeignKey("ContentId")]
+        [ForeignKey("CategoryItemId")]
         public virtual CategoryItem? CategoryItem { get; set; } //Establishing one-to-one relationship
         public int? CategoryItemId { get; set;}
         //N: This property cannot be 

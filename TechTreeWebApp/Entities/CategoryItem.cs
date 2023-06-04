@@ -34,6 +34,6 @@ namespace TechTreeWebApp.Entities
                 _releasedDate = value;
             }
         }
-        public int ContentId { get; set; }
+        public int ContentId { get; set; } // Do not remove
     }
 }

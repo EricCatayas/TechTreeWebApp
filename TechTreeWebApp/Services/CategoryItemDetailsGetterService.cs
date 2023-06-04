@@ -19,9 +19,9 @@ namespace TechTreeWebApp.Services
                          join category in _context.Category
                          on catItem.CategoryId equals category.Id
                          join content in _context.Content
-                         on catItem.Id equals content.CategoryItem.Id
-                         join userCat in _context.UserCategory
-                         on category.Id equals userCat.CategoryId
+                         on catItem.Id equals content.CategoryItemId 
+                         /*join userCat in _context.UserCategory
+                         on category.Id equals userCat.CategoryId*/
                          join mediaType in _context.MediaType
                          on catItem.MediaTypeId equals mediaType.Id
                          select new CategoryItemDetailsModel

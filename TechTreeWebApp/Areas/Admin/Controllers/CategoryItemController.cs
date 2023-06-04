@@ -32,7 +32,7 @@ namespace TechTreeWebApp.Areas.Admin.Controllers
         public async Task<IActionResult> Index(int categoryId)
         {
             // Ex: Category "C# for beginners,  Categoryitem "data variables, methods, etc"
-            List<CategoryItem>? categoryItems = await _categoryItemGetterService.GetCategoryItemByCategoryId(categoryId);
+            List<CategoryItem>? categoryItems = await _categoryItemGetterService.GetCategoryItemsByCategoryId(categoryId);
             ViewBag.CategoryId = categoryId;
               return View(categoryItems);
         }

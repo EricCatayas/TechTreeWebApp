@@ -18,7 +18,7 @@ namespace TechTreeWebApp.Services
             return await _context.CategoryItem.ToListAsync();
         }
 
-        public async Task<List<CategoryItem>?> GetCategoryItemByCategoryId(int? categoryId)
+        public async Task<List<CategoryItem>?> GetCategoryItemsByCategoryId(int? categoryId)
         {
             if (categoryId == null)
                 return null;

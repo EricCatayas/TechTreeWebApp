@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Index";
+    const int maxLength = 75;
 }
 
 <h1>Index</h1>
@@ -31,7 +32,15 @@
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Description)
+                @if (item.Description.Length > maxLength)
+                {
+                    string shortenedDescription = item.Description.Substring(0, maxLength) + "...";
+                    @Html.DisplayFor(modelItem =>  shortenedDescription)
+                }
+                else
+                {                        
+                    @Html.DisplayFor(modelItem =>  item.Description)                        
+                }
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ThumbnailImagePath)
