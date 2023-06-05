@@ -6,10 +6,13 @@ using TechTreeWebApp.ServiceContracts;
 using TechTreeWebApp.Services;
 
 
-var builder = WebApplication.CreateBuilder(args); 
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection"); 
+var connectionString = builder.Configuration.GetConnectionString("AzureSQLTechTreeDatabase"); 
+
+if(connectionString == null)
+    connectionString = Environment.GetEnvironmentVariable("AzureSQLTechTreeDatabase");
 
 // .AddDbContext(What type of code is our db using?);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -47,6 +50,7 @@ builder.Services.AddScoped<IMediaTypeGetterService, MediaTypeGetterService>();
 builder.Services.AddScoped<IMediaTypeUpdaterService, MediaTypeUpdaterService>();
 
 // builder.Services.AddScoped<AdminHomeAuthorizationFilter>();
+builder.Services.AddApplicationInsightsTelemetry();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
