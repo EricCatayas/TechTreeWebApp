@@ -14,9 +14,12 @@ var connectionString = builder.Configuration.GetConnectionString("AzureSQLTechTr
 if(connectionString == null)
     connectionString = Environment.GetEnvironmentVariable("AzureSQLTechTreeDatabase");
 
+if (connectionString == null)
+    connectionString = builder.Configuration["AzureSQLTechTreeDatabase"].ToString();
+
 // .AddDbContext(What type of code is our db using?);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+options.UseSqlServer(connectionString));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 // M:AddDefaultIdentity<ApplicationUser>
