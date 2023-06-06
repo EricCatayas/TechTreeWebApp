@@ -10,10 +10,10 @@
             </div>
             <!-- N: the strong typing for LoginModel-->
             <form id="UserLoginForm" asp-controller="UserAuth" asp-action="Login">
-                <div class="badge bg-primary text-dark bg-opacity-50" style="width: 12rem;">
-                    Use admin@user.com Password: Admin1!<br />
+                <span class="badge bg-primary text-dark bg-opacity-50">
+                    Use: admin@user.com Password: Admin1!<br />
                     or user@example.com Password: User1!
-                </div>
+                </span>
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="LoginInValid" />
                 <div class="form-group row">
