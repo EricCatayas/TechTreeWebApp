@@ -9,10 +9,16 @@ using TechTreeWebApp.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("AzureSQLTechTreeDatabase"); 
 
-if (connectionString == null)
-    connectionString = builder.Configuration["AzureSQLTechTreeDatabase"].ToString();
+var connectionString = "";
+if (builder.Environment.IsDevelopment())
+{
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+}
+else
+{
+    connectionString = builder.Configuration.GetConnectionString("AzureSQLTechTreeDatabase");
+}
 
 // .AddDbContext(What type of code is our db using?);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

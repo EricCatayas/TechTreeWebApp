@@ -33,7 +33,7 @@ namespace TechTreeWebApp.Controllers
             if (ModelState.IsValid) 
             {
                 var identityresult = await _signInManager.PasswordSignInAsync(signedUser.UserName, loginModel.Password, loginModel.RememberMe, lockoutOnFailure: true);
-                                                                        //params: string userName, password, bool isPersistent
+                                                                        
                 if (identityresult.Succeeded)
                 {
                     loginModel.LoginInValid = "";
